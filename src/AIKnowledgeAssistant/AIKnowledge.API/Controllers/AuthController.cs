@@ -4,6 +4,7 @@ using AIKnowledge.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AIKnowledge.API.Extensions;
+using AIKnowledge.Application.Features.Auth.RefreshToken;
 
 namespace AIKnowledge.API.Controllers;
 
@@ -58,6 +59,15 @@ public class AuthController : ControllerBase
         int userId = User.GetUserId();
 
         var result = await _authService.GetCurrentUserAsync(userId);
+
+        return Ok(result);
+    }
+
+    [HttpPost("refresh-token")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
+    {
+        var result = await _authService.RefreshTokenAsync(request);
 
         return Ok(result);
     }

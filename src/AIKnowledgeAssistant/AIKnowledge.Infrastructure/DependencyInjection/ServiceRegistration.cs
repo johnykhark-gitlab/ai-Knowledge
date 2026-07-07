@@ -22,6 +22,8 @@ public static class ServiceRegistration
 
         services.AddScoped<IJwtService, JwtService>();
 
+        services.AddScoped<IAuditRepository, AuditRepository>();
+
         return services;
     }
 }
