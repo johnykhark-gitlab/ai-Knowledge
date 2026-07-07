@@ -3,6 +3,7 @@ using AIKnowledge.Application.Features.Auth.Register;
 using AIKnowledge.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AIKnowledge.API.Extensions;
 
 namespace AIKnowledge.API.Controllers;
 
@@ -48,6 +49,17 @@ public class AuthController : ControllerBase
     public IActionResult Test()
     {
         return Ok("Authentication Module Working Successfully");
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        int userId = User.GetUserId();
+
+        var result = await _authService.GetCurrentUserAsync(userId);
+
+        return Ok(result);
     }
 }
 

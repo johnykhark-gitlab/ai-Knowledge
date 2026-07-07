@@ -131,6 +131,21 @@ SELECT CAST(SCOPE_IDENTITY() AS INT);
 
         await connection.ExecuteAsync(sql, token);
     }
+
+    public async Task<User?> GetUserByIdAsync(int userId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        string sql = @"
+SELECT *
+FROM Users
+WHERE UserId=@UserId
+AND IsDeleted=0";
+
+        return await connection.QueryFirstOrDefaultAsync<User>(
+            sql,
+            new { UserId = userId });
+    }
 }
 
 

@@ -1,4 +1,5 @@
 ﻿using AIKnowledge.Application.Features.Auth.Login;
+using AIKnowledge.Application.Features.Auth.Me;
 using AIKnowledge.Application.Features.Auth.Register;
 using AIKnowledge.Application.Interfaces;
 using AIKnowledge.Domain.Entities;
@@ -87,6 +88,24 @@ public class AuthService : IAuthService
             Token = token,
             RefreshToken = refreshToken,
             Expiry = DateTime.UtcNow.AddMinutes(60)
+        };
+    }
+
+    public async Task<MeResponse> GetCurrentUserAsync(int userId)
+    {
+        var user = await _repository.GetUserByIdAsync(userId);
+
+        if (user == null)
+            throw new Exception("User not found.");
+
+        string role = await _repository.GetRoleNameAsync(user.RoleId) ?? "";
+
+        return new MeResponse
+        {
+            UserId = user.UserId,
+            FullName = $"{user.FirstName} {user.LastName}",
+            Email = user.Email,
+            Role = role
         };
     }
 }
