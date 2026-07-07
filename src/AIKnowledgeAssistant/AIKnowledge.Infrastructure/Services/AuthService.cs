@@ -61,12 +61,22 @@ public class AuthService : IAuthService
 
         string role = await _repository.GetRoleNameAsync(user.RoleId) ?? "User";
 
+        await _repository.UpdateLastLoginAsync(user.UserId);
+
+
         string token = _jwtService.GenerateToken(
             user.UserId,
             user.Email,
             role);
 
         string refreshToken = _jwtService.GenerateRefreshToken();
+        await _repository.SaveRefreshTokenAsync(
+            new RefreshToken
+            {
+                UserId = user.UserId,
+                Token = refreshToken,
+                ExpiryDate = DateTime.UtcNow.AddDays(7)
+            });
 
         return new LoginResponse
         {

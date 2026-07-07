@@ -11,4 +11,7 @@ public interface IAuthRepository
     Task<string?> GetRoleNameAsync(int roleId);
 
     Task<bool> EmailExistsAsync(string email);
+
+    Task UpdateLastLoginAsync(int userId);
+    Task SaveRefreshTokenAsync(RefreshToken token);
 }

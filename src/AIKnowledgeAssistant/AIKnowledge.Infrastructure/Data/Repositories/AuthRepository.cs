@@ -91,6 +91,46 @@ SELECT CAST(SCOPE_IDENTITY() AS INT);
             sql,
             new { RoleId = roleId });
     }
+
+    public async Task UpdateLastLoginAsync(int userId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        string sql = @"
+        UPDATE Users
+        SET LastLogin = GETDATE()
+        WHERE UserId=@UserId";
+
+        await connection.ExecuteAsync(sql,
+            new { UserId = userId });
+    }
+    public async Task SaveRefreshTokenAsync(RefreshToken token)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        string sql = @"
+
+            INSERT INTO RefreshTokens
+            (
+            UserId,
+            Token,
+            ExpiryDate,
+            IsRevoked,
+            CreatedOn
+            )
+
+            VALUES
+            (
+            @UserId,
+            @Token,
+            @ExpiryDate,
+            0,
+            GETDATE()
+            )
+            ";
+
+        await connection.ExecuteAsync(sql, token);
+    }
 }
 
 
