@@ -9,24 +9,24 @@ public class AuthService : IAuthService
 {
     private readonly IAuthRepository _repository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtService _jwtService;
 
     public AuthService(
         IAuthRepository repository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        IJwtService jwtService)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
+        _jwtService = jwtService;
     }
 
     public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
     {
-        bool exists =
-            await _repository.EmailExistsAsync(request.Email);
-
-        if (exists)
+        if (await _repository.EmailExistsAsync(request.Email))
             throw new Exception("Email already exists.");
 
-        User user = new()
+        var user = new User
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
@@ -36,18 +36,47 @@ public class AuthService : IAuthService
             RoleId = 2
         };
 
-        int id =
-            await _repository.RegisterUserAsync(user);
+        int userId = await _repository.RegisterUserAsync(user);
 
         return new RegisterResponse
         {
-            UserId = id,
-            Message = "Registration Successful"
+            UserId = userId,
+            Message = "User registered successfully."
         };
     }
 
     public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
-        throw new NotImplementedException();
+        var user = await _repository.GetUserByEmailAsync(request.Email);
+
+        if (user == null)
+            throw new Exception("Invalid email or password.");
+
+        bool validPassword = _passwordHasher.VerifyPassword(
+            request.Password,
+            user.PasswordHash);
+
+        if (!validPassword)
+            throw new Exception("Invalid email or password.");
+
+        string role = await _repository.GetRoleNameAsync(user.RoleId) ?? "User";
+
+        string token = _jwtService.GenerateToken(
+            user.UserId,
+            user.Email,
+            role);
+
+        string refreshToken = _jwtService.GenerateRefreshToken();
+
+        return new LoginResponse
+        {
+            UserId = user.UserId,
+            FullName = $"{user.FirstName} {user.LastName}",
+            Email = user.Email,
+            Role = role,
+            Token = token,
+            RefreshToken = refreshToken,
+            Expiry = DateTime.UtcNow.AddMinutes(60)
+        };
     }
 }

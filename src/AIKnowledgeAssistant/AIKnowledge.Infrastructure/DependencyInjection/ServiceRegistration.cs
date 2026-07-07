@@ -12,7 +12,7 @@ public static class ServiceRegistration
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services)
     {
-        services.AddSingleton<SqlConnectionFactory>();
+        services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 
         services.AddScoped<IAuthRepository, AuthRepository>();
 

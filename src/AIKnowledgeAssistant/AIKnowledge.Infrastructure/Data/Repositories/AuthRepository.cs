@@ -7,9 +7,9 @@ namespace AIKnowledge.Infrastructure.Data.Repositories;
 
 public class AuthRepository : IAuthRepository
 {
-    private readonly SqlConnectionFactory _connectionFactory;
+    private readonly ISqlConnectionFactory _connectionFactory;
 
-    public AuthRepository(SqlConnectionFactory connectionFactory)
+    public AuthRepository(ISqlConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
@@ -33,7 +33,7 @@ public class AuthRepository : IAuthRepository
 
         string sql = @"SELECT COUNT(1)
                        FROM Users
-                       WHERE Email=@Email";
+                       WHERE Email=@Email AND IsDeleted=0";
 
         return await connection.ExecuteScalarAsync<bool>(
             sql,

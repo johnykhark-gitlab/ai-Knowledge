@@ -1,10 +1,11 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using AIKnowledge.Application.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace AIKnowledge.Infrastructure.Data.Connection;
 
-public class SqlConnectionFactory
+public class SqlConnectionFactory : ISqlConnectionFactory
 {
     private readonly IConfiguration _configuration;
 
