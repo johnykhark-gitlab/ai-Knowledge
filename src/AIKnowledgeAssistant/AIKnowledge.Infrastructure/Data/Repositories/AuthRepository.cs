@@ -146,6 +146,33 @@ AND IsDeleted=0";
             sql,
             new { UserId = userId });
     }
+    public async Task<RefreshToken?> GetRefreshTokenAsync(string token)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        string sql = @"
+SELECT *
+FROM RefreshTokens
+WHERE Token=@Token
+AND IsRevoked=0";
+
+        return await connection.QueryFirstOrDefaultAsync<RefreshToken>(
+            sql,
+            new { Token = token });
+    }
+
+    public async Task UpdateRefreshTokenAsync(RefreshToken token)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        string sql = @"
+UPDATE RefreshTokens
+SET
+IsRevoked=@IsRevoked
+WHERE RefreshTokenId=@RefreshTokenId";
+
+        await connection.ExecuteAsync(sql, token);
+    }
 }
 
 
