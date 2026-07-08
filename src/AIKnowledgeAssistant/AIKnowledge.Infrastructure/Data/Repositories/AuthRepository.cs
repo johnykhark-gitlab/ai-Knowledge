@@ -173,6 +173,26 @@ WHERE RefreshTokenId=@RefreshTokenId";
 
         await connection.ExecuteAsync(sql, token);
     }
+
+    public async Task UpdatePasswordAsync(int userId, string passwordHash)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        string sql = @"
+UPDATE Users
+SET
+PasswordHash=@PasswordHash,
+ModifiedOn=GETDATE(),
+ModifiedBy='System'
+WHERE UserId=@UserId";
+
+        await connection.ExecuteAsync(sql,
+            new
+            {
+                UserId = userId,
+                PasswordHash = passwordHash
+            });
+    }
 }
 
 

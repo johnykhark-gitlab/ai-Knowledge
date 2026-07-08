@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using AIKnowledge.API.Extensions;
 using AIKnowledge.Application.Features.Auth.RefreshToken;
 using AIKnowledge.Application.Features.Auth.Logout;
-
+using AIKnowledge.Application.Features.Auth.ChangePassword;
 namespace AIKnowledge.API.Controllers;
 
 [ApiController]
@@ -77,6 +77,16 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Logout(LogoutRequest request)
     {
         var result = await _authService.LogoutAsync(request);
+
+        return Ok(result);
+    }
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        int userId = User.GetUserId();
+
+        var result = await _authService.ChangePasswordAsync(userId, request);
 
         return Ok(result);
     }

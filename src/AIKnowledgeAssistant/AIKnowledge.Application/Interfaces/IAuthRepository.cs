@@ -20,6 +20,6 @@ public interface IAuthRepository
 
     Task UpdateRefreshTokenAsync(RefreshToken token);
 
-
+    Task UpdatePasswordAsync(int userId, string passwordHash);
 
 }

@@ -1,4 +1,5 @@
-﻿using AIKnowledge.Application.Features.Auth.Login;
+﻿using AIKnowledge.Application.Features.Auth.ChangePassword;
+using AIKnowledge.Application.Features.Auth.Login;
 using AIKnowledge.Application.Features.Auth.Logout;
 using AIKnowledge.Application.Features.Auth.Me;
 using AIKnowledge.Application.Features.Auth.RefreshToken;
@@ -15,4 +16,5 @@ public interface IAuthService
     Task<RefreshTokenResponse> RefreshTokenAsync(
     RefreshTokenRequest request);
     Task<LogoutResponse> LogoutAsync(LogoutRequest request);
+    Task<ChangePasswordResponse> ChangePasswordAsync(int userId,ChangePasswordRequest request);
 }

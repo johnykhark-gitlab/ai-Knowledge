@@ -1,4 +1,5 @@
-﻿using AIKnowledge.Application.Features.Auth.Login;
+﻿using AIKnowledge.Application.Features.Auth.ChangePassword;
+using AIKnowledge.Application.Features.Auth.Login;
 using AIKnowledge.Application.Features.Auth.Logout;
 using AIKnowledge.Application.Features.Auth.Me;
 using AIKnowledge.Application.Features.Auth.RefreshToken;
@@ -131,7 +132,8 @@ public class AuthService : IAuthService
             UserId = user.UserId,
             FullName = $"{user.FirstName} {user.LastName}",
             Email = user.Email,
-            Role = role
+            Role = role,
+            LastLogin = user.LastLogin
         };
     }
 
@@ -222,4 +224,44 @@ public class AuthService : IAuthService
             Message = "Logout successful."
         };
     }
+    public async Task<ChangePasswordResponse> ChangePasswordAsync(int userId, ChangePasswordRequest request)
+    {
+        if (request.NewPassword != request.ConfirmPassword)
+            throw new Exception("Password and Confirm Password do not match.");
+
+        var user = await _repository.GetUserByIdAsync(userId);
+
+        if (user == null)
+            throw new Exception("User not found.");
+
+        bool validPassword = _passwordHasher.VerifyPassword(
+            request.OldPassword,
+            user.PasswordHash);
+
+        if (!validPassword)
+            throw new Exception("Old password is incorrect.");
+
+        string newHash = _passwordHasher.HashPassword(request.NewPassword);
+
+        await _repository.UpdatePasswordAsync(
+            userId,
+            newHash);
+
+        await _auditRepository.AddAsync(new AuditLog
+        {
+            UserId = userId,
+            Action = "CHANGE_PASSWORD",
+            TableName = "Users",
+            RecordId = userId,
+            Description = "Password changed successfully.",
+            IPAddress = ""
+        });
+
+        return new ChangePasswordResponse
+        {
+            Success = true,
+            Message = "Password changed successfully."
+        };
+    }
 }
+
