@@ -1,4 +1,5 @@
 ﻿using AIKnowledge.Application.Features.Auth.Login;
+using AIKnowledge.Application.Features.Auth.Logout;
 using AIKnowledge.Application.Features.Auth.Me;
 using AIKnowledge.Application.Features.Auth.RefreshToken;
 using AIKnowledge.Application.Features.Auth.Register;
@@ -189,6 +190,36 @@ public class AuthService : IAuthService
             Token = newJwt,
             RefreshToken = newRefreshToken,
             Expiry = DateTime.UtcNow.AddMinutes(60)
+        };
+    }
+    public async Task<LogoutResponse> LogoutAsync(LogoutRequest request)
+    {
+        var token = await _repository.GetRefreshTokenAsync(request.RefreshToken);
+
+        if (token == null)
+            throw new Exception("Invalid Refresh Token.");
+
+        if (token.IsRevoked)
+            throw new Exception("Already Logged Out.");
+
+        token.IsRevoked = true;
+
+        await _repository.UpdateRefreshTokenAsync(token);
+
+        await _auditRepository.AddAsync(new AuditLog
+        {
+            UserId = token.UserId,
+            Action = "LOGOUT",
+            TableName = "RefreshTokens",
+            RecordId = token.RefreshTokenId,
+            Description = "User logged out successfully.",
+            IPAddress = ""
+        });
+
+        return new LogoutResponse
+        {
+            Success = true,
+            Message = "Logout successful."
         };
     }
 }

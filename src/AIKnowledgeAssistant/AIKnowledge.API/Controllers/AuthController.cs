@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AIKnowledge.API.Extensions;
 using AIKnowledge.Application.Features.Auth.RefreshToken;
+using AIKnowledge.Application.Features.Auth.Logout;
 
 namespace AIKnowledge.API.Controllers;
 
@@ -68,6 +69,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
     {
         var result = await _authService.RefreshTokenAsync(request);
+
+        return Ok(result);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(LogoutRequest request)
+    {
+        var result = await _authService.LogoutAsync(request);
 
         return Ok(result);
     }
