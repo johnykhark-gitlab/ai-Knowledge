@@ -3,6 +3,7 @@ using AIKnowledge.Infrastructure.Data.Connection;
 using AIKnowledge.Infrastructure.Data.Repositories;
 using AIKnowledge.Infrastructure.Security;
 using AIKnowledge.Infrastructure.Services;
+using AIKnowledge.Infrastructure.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AIKnowledge.Infrastructure.DependencyInjection;
@@ -23,6 +24,10 @@ public static class ServiceRegistration
         services.AddScoped<IJwtService, JwtService>();
 
         services.AddScoped<IAuditRepository, AuditRepository>();
+        services.AddScoped<IDocumentRepository, DocumentRepository>();
+        services.AddScoped<IStorageService, LocalStorageService>();
+        services.AddScoped<IDocumentService, DocumentService>();
+
 
         return services;
     }
