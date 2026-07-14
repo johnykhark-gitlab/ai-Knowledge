@@ -7,9 +7,9 @@ namespace AIKnowledge.Infrastructure.Data.Repositories;
 
 public class DocumentRepository : IDocumentRepository
 {
-    private readonly SqlConnectionFactory _connectionFactory;
+    private readonly ISqlConnectionFactory _connectionFactory;
 
-    public DocumentRepository(SqlConnectionFactory connectionFactory)
+    public DocumentRepository(ISqlConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
@@ -118,5 +118,24 @@ WHERE DocumentId=@DocumentId
         await connection.ExecuteAsync(
             sql,
             new { DocumentId = documentId });
+    }
+
+    public async Task UpdateAIStatusAsync(
+    int documentId,
+    string status)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        string sql = @"
+UPDATE Documents
+SET AIProcessingStatus=@Status
+WHERE DocumentId=@DocumentId";
+
+        await connection.ExecuteAsync(sql,
+            new
+            {
+                DocumentId = documentId,
+                Status = status
+            });
     }
 }

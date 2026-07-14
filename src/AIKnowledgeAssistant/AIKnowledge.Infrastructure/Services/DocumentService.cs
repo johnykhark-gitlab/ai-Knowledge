@@ -10,15 +10,20 @@ public class DocumentService : IDocumentService
     private readonly IDocumentRepository _repository;
     private readonly IStorageService _storageService;
     private readonly IAuditRepository _auditRepository;
+    private readonly DocumentProcessorService _documentProcessorService;
 
     public DocumentService(
         IDocumentRepository repository,
         IStorageService storageService,
-        IAuditRepository auditRepository)
+        IAuditRepository auditRepository,
+        DocumentProcessorService documentProcessorService
+        )
     {
         _repository = repository;
         _storageService = storageService;
         _auditRepository = auditRepository;
+        _documentProcessorService = documentProcessorService;
+        _documentProcessorService = documentProcessorService;
     }
 
     public async Task DeleteDocumentAsync(int documentId)
@@ -120,7 +125,9 @@ public class DocumentService : IDocumentService
             Description = $"Uploaded document : {file.FileName}",
             IPAddress = ""
         });
-
+        await _documentProcessorService.ProcessDocumentAsync(
+    documentId,
+    document.FilePath);
         return new DocumentDto
         {
             DocumentId = documentId,

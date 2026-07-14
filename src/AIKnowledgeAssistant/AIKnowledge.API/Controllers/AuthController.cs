@@ -53,11 +53,24 @@ public class AuthController : ControllerBase
         return Ok("Authentication Module Working Successfully");
     }
 
+    //[Authorize]
+    //[HttpGet("me")]
+    //public async Task<IActionResult> Me()
+    //{
+    //    int userId = User.GetUserId();
+
+    //    var result = await _authService.GetCurrentUserAsync(userId);
+
+    //    return Ok(result);
+    //}
+
     [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> Me()
     {
         int userId = User.GetUserId();
+
+        Console.WriteLine($"Controller UserId = {userId}");
 
         var result = await _authService.GetCurrentUserAsync(userId);
 
@@ -89,6 +102,17 @@ public class AuthController : ControllerBase
         var result = await _authService.ChangePasswordAsync(userId, request);
 
         return Ok(result);
+    }
+
+    [HttpGet("claims")]
+    [Authorize]
+    public IActionResult Claims()
+    {
+        return Ok(User.Claims.Select(c => new
+        {
+            c.Type,
+            c.Value
+        }));
     }
 }
 

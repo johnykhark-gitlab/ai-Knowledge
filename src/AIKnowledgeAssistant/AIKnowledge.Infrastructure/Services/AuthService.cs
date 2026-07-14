@@ -120,6 +120,7 @@ public class AuthService : IAuthService
 
     public async Task<MeResponse> GetCurrentUserAsync(int userId)
     {
+        Console.WriteLine($"UserId = {userId}");
         var user = await _repository.GetUserByIdAsync(userId);
 
         if (user == null)

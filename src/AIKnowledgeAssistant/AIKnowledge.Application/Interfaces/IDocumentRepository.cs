@@ -11,4 +11,5 @@ public interface IDocumentRepository
     Task<Document?> GetDocumentByIdAsync(int documentId);
 
     Task DeleteDocumentAsync(int documentId);
+    Task UpdateAIStatusAsync(int documentId, string status);
 }
